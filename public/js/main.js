@@ -9,7 +9,7 @@ import { WEAPONS, WEAPON_ORDER } from './weapon.js';
 
 const state = {
   token: null,
-  user: null, // { username, email, level, coins, diamonds, rank }
+  user: null,
   forgotEmail: null,
   careerStats: { kills: 0, deaths: 0, wins: 0, matches: 0 },
 };
@@ -52,6 +52,26 @@ function runSplash() {
   requestAnimationFrame(step);
 }
 
+// ---------------------------------------------------------------------------
+// 🔥 NEW: Auto-register a dummy account and login
+// ---------------------------------------------------------------------------
+async function autoRegisterAndLogin() {
+  try {
+    const random = Math.floor(Math.random() * 10000);
+    const dummy = {
+      username: 'Guest_' + random,
+      email: 'guest' + Date.now() + '@dummy.com',
+      password: 'dummy123',
+      confirmPassword: 'dummy123'
+    };
+    const data = await api('/register', dummy);
+    onAuthed(data);
+  } catch (err) {
+    console.warn('Auto-register failed, showing register screen.', err);
+    ui.showScreen('screen-register');
+  }
+}
+
 function afterSplash() {
   const savedToken = localStorage.getItem(TOKEN_KEY);
   const savedUser = localStorage.getItem(USER_KEY);
@@ -60,13 +80,13 @@ function afterSplash() {
     state.user = JSON.parse(savedUser);
     enterLobby();
   } else {
-    // 🔥 CHANGE: Directly open Register screen (instead of Login)
-    ui.showScreen('screen-register');
+    // 🔥 AUTO-REGISTER and LOGIN (no user input needed)
+    autoRegisterAndLogin();
   }
 }
 
 // ---------------------------------------------------------------------------
-// Auth: login / register / forgot password
+// Auth: login / register / forgot password (still available if needed)
 // ---------------------------------------------------------------------------
 function wireAuth() {
   document.querySelectorAll('[data-goto]').forEach((btn) => {
@@ -103,7 +123,7 @@ function wireAuth() {
     }
   });
 
-  // Forgot password — 3 steps
+  // Forgot password steps (unchanged)
   document.getElementById('form-forgot-email').addEventListener('submit', async (e) => {
     e.preventDefault();
     const errEl = document.getElementById('forgot-email-error');
@@ -113,7 +133,7 @@ function wireAuth() {
       const data = await api('/forgot-password', { email });
       state.forgotEmail = email;
       document.getElementById('forgot-otp-hint').textContent =
-        data.devCode ? `Dev mode (no email service configured): your code is ${data.devCode}` : '';
+        data.devCode ? `Dev mode: your code is ${data.devCode}` : '';
       switchForgotStep('forgot-step-otp');
     } catch (err) {
       errEl.textContent = err.message;
