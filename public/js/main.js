@@ -60,7 +60,8 @@ function afterSplash() {
     state.user = JSON.parse(savedUser);
     enterLobby();
   } else {
-    ui.showScreen('screen-login');
+    // 🔥 CHANGE: Directly open Register screen (instead of Login)
+    ui.showScreen('screen-register');
   }
 }
 
