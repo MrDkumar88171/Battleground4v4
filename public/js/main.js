@@ -9,7 +9,7 @@ import { WEAPONS, WEAPON_ORDER } from './weapon.js';
 
 const state = {
   token: null,
-  user: null,           // { username, email, level, coins, diamonds, rank }
+  user: null, // { username, email, level, coins, diamonds, rank }
   forgotEmail: null,
   careerStats: { kills: 0, deaths: 0, wins: 0, matches: 0 },
 };
@@ -316,7 +316,6 @@ function handleMatchEnd(data, stats, localTeam) {
   document.getElementById('rs-xp').textContent = xp;
   document.getElementById('rs-coins').textContent = coins;
 
-  // Client-side career/wallet update (demo only — wire to a real backend write for production).
   state.careerStats.kills += stats.kills;
   state.careerStats.deaths += stats.deaths;
   state.careerStats.matches += 1;
